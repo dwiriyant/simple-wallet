@@ -93,6 +93,33 @@ paths:
                       message:
                         type: string
                         example: Transfer success
+  /wallet/balance:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Wallet
+      summary: Get User Balance
+      responses:
+        "200":
+          description: Success get balance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Success get balance
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: integer
+                        example: 50000
 components:
   securitySchemes:
     bearerAuth:
