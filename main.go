@@ -1,8 +1,8 @@
 package main
 
 import (
-	"net/http"
 	"simple-wallet/db"
+	"simple-wallet/routes"
 
 	"github.com/labstack/echo/v4"
 )
@@ -11,8 +11,8 @@ func main() {
 	db.Init()
 
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Simple Wallet REST API")
-	})
+
+	routes.API(e)
+
 	e.Logger.Fatal(e.Start(":8081"))
 }
