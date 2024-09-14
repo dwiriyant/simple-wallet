@@ -28,6 +28,16 @@ func Register(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to create user"})
 	}
 
+	// create user wallet and insert 50K default balance
+	userWallet := models.Wallet{
+		UserID:  user.ID,
+		Balance: 50000,
+	}
+
+	if err := db.DB.Create(&userWallet).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to create user"})
+	}
+
 	return c.JSON(http.StatusOK, map[string]string{"status": "success", "message": "Success to create user"})
 }
 
