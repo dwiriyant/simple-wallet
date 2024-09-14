@@ -6,6 +6,7 @@ import (
 	"simple-wallet/models"
 	"simple-wallet/services"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
@@ -70,4 +71,19 @@ func Login(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func GetUserIDFromToken(c echo.Context) (int, error) {
+	user := c.Get("user")
+	if user == nil {
+		return 0, echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized access")
+	}
+
+	token := user.(*jwt.Token)
+	claims, ok := token.Claims.(*services.JWTClaims)
+	if !ok || !token.Valid {
+		return 0, echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
+	}
+
+	return claims.ID, nil
 }
