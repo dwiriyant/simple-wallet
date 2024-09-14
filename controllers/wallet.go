@@ -45,3 +45,25 @@ func TransferMoney(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]string{"status": "success", "message": "Transfer Success"})
 }
+
+func GetBalance(c echo.Context) error {
+	userID, err := GetUserIDFromToken(c)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"status": "error", "message": "Unauthorized"})
+	}
+
+	var wallet models.Wallet
+	if err := db.DB.Where("user_id = ?", userID).First(&wallet).Error; err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"status": "error", "message": "User wallet not found"})
+	}
+
+	response := map[string]interface{}{
+		"status":  "success",
+		"message": "Success get balance",
+		"data": map[string]float64{
+			"balance": wallet.Balance,
+		},
+	}
+
+	return c.JSON(http.StatusOK, response)
+}

@@ -21,4 +21,5 @@ func API(e *echo.Echo) {
 	wallet := e.Group("wallet")
 	wallet.Use(authMiddleware)
 	wallet.POST("/transfer", controllers.TransferMoney)
+	wallet.GET("/balance", controllers.GetBalance)
 }
