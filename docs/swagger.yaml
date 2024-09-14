@@ -1,0 +1,120 @@
+openapi: 3.0.0
+info:
+  title: Simple Wallet REST API
+  description: A simple wallet REST API
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8081
+    description: Local development server
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Create new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        "200":
+          description: Success to create user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: success
+                      message:
+                        type: string
+                        example: Login success
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Authenticate account credentials and return a JWT token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        "200":
+          description: Login success, will return JWT access token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Login success
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VyMSIsImV4cCI6MTcyNjM5NTMyNn0.SdhHgsQ5JWJmVcvqS6zLD8uTPnerLfOjEjdELWCHenA"
+  /wallet/transfer:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Wallet
+      summary: Transfer money between wallets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        "200":
+          description: Transfer success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: success
+                      message:
+                        type: string
+                        example: Transfer success
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  schemas:
+    AuthRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "user1"
+        password:
+          type: string
+          example: "pass123"
+    TransferRequest:
+      type: object      
+      properties:
+        username:
+          type: string
+          example: "user2"
+        amount:
+          type: integer
+          example: 50000
