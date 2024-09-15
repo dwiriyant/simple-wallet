@@ -32,8 +32,12 @@ func TransferMoney(c echo.Context) error {
 	}
 
 	var fromWallet models.Wallet
-	if err := db.DB.Where("user_id = ?", userID).First(&fromWallet).Error; err != nil {
+	if err := db.DB.Joins("User").Where("user_id = ?", userID).First(&fromWallet).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"status": "error", "message": "Sender wallet not found"})
+	}
+
+	if fromWallet.User.Username == transferRequest.Username {
+		return c.JSON(http.StatusBadRequest, map[string]string{"status": "error", "message": "Cannot transfer wallet to own user"})
 	}
 
 	var toWallet models.Wallet
