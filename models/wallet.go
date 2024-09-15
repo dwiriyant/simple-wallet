@@ -29,7 +29,7 @@ func (w *Wallet) Transfer(db *gorm.DB, amount float64) (err error) {
 		}
 	}()
 
-	if err = tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&w, w.ID).Error; err != nil {
+	if err = tx.Clauses(clause.Locking{Strength: "UPDATE"}).Find(&w).Error; err != nil {
 		return
 	}
 
@@ -38,7 +38,7 @@ func (w *Wallet) Transfer(db *gorm.DB, amount float64) (err error) {
 	}
 
 	w.Balance -= amount
-	if err = tx.Save(&w).Error; err != nil {
+	if err = tx.Model(&w).Update("balance", w.Balance).Error; err != nil {
 		return
 	}
 
