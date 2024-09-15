@@ -5,12 +5,13 @@ import (
 	"simple-wallet/db"
 	"simple-wallet/models"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
 type transferRequest struct {
-	Username string  `json:"username"`
-	Amount   float64 `json:"amount"`
+	Username string `json:"username" validate:"required"`
+	Amount   int    `json:"amount" validate:"required,numeric,gt=0"`
 }
 
 func TransferMoney(c echo.Context) error {
@@ -24,6 +25,12 @@ func TransferMoney(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"status": "error", "message": "Invalid request"})
 	}
 
+	validate := validator.New()
+	err = validate.Struct(transferRequest)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"status": "error", "message": "Invalid request"})
+	}
+
 	var fromWallet models.Wallet
 	if err := db.DB.Where("user_id = ?", userID).First(&fromWallet).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"status": "error", "message": "Sender wallet not found"})
@@ -34,11 +41,12 @@ func TransferMoney(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"status": "error", "message": "Recipient wallet not found"})
 	}
 
-	if err := fromWallet.Transfer(db.DB, transferRequest.Amount); err != nil {
+	amount64 := float64(transferRequest.Amount)
+	if err := fromWallet.Transfer(db.DB, amount64); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"status": "error", "message": err.Error()})
 	}
 
-	toWallet.Balance += transferRequest.Amount
+	toWallet.Balance += amount64
 	if err := db.DB.Save(&toWallet).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to update recipient wallet"})
 	}
