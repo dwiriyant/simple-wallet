@@ -51,7 +51,7 @@ func TransferMoney(c echo.Context) error {
 	}
 
 	toWallet.Balance += amount64
-	if err := db.DB.Save(&toWallet).Error; err != nil {
+	if err := db.DB.Model(&toWallet).Update("balance", toWallet.Balance).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to update recipient wallet"})
 	}
 
