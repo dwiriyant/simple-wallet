@@ -17,7 +17,7 @@ type Wallet struct {
 	User      User `gorm:"belongsTo"`
 }
 
-func (w *Wallet) Transfer(db *gorm.DB, amount float64) (err error) {
+func (w *Wallet) Transfer(db *gorm.DB, toWallet Wallet, amount float64) (err error) {
 	tx := db.Begin()
 
 	defer func() {
@@ -40,6 +40,11 @@ func (w *Wallet) Transfer(db *gorm.DB, amount float64) (err error) {
 	w.Balance -= amount
 	if err = tx.Model(&w).Update("balance", w.Balance).Error; err != nil {
 		return
+	}
+
+	toWallet.Balance += amount
+	if err = tx.Model(&toWallet).Update("balance", toWallet.Balance).Error; err != nil {
+		return errors.New("Failed to update recipient wallet")
 	}
 
 	return

@@ -46,13 +46,8 @@ func TransferMoney(c echo.Context) error {
 	}
 
 	amount64 := float64(transferRequest.Amount)
-	if err := fromWallet.Transfer(db.DB, amount64); err != nil {
+	if err := fromWallet.Transfer(db.DB, toWallet, amount64); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"status": "error", "message": err.Error()})
-	}
-
-	toWallet.Balance += amount64
-	if err := db.DB.Model(&toWallet).Update("balance", toWallet.Balance).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to update recipient wallet"})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"status": "success", "message": "Transfer Success"})
