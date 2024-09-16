@@ -15,7 +15,7 @@ type transferRequest struct {
 }
 
 func TransferMoney(c echo.Context) error {
-	userID, err := GetUserIDFromToken(c)
+	claims, err := GetClaimsFromToken(c)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"status": "error", "message": "Unauthorized"})
 	}
@@ -25,6 +25,10 @@ func TransferMoney(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"status": "error", "message": "Invalid request"})
 	}
 
+	if claims.Username == transferRequest.Username {
+		return c.JSON(http.StatusBadRequest, map[string]string{"status": "error", "message": "Cannot transfer wallet to own user"})
+	}
+
 	validate := validator.New()
 	err = validate.Struct(transferRequest)
 	if err != nil {
@@ -32,12 +36,8 @@ func TransferMoney(c echo.Context) error {
 	}
 
 	var fromWallet models.Wallet
-	if err := db.DB.Joins("User").Where("user_id = ?", userID).First(&fromWallet).Error; err != nil {
+	if err := db.DB.Where("user_id = ?", claims.ID).First(&fromWallet).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"status": "error", "message": "Sender wallet not found"})
-	}
-
-	if fromWallet.User.Username == transferRequest.Username {
-		return c.JSON(http.StatusBadRequest, map[string]string{"status": "error", "message": "Cannot transfer wallet to own user"})
 	}
 
 	var toWallet models.Wallet
@@ -59,13 +59,13 @@ func TransferMoney(c echo.Context) error {
 }
 
 func GetBalance(c echo.Context) error {
-	userID, err := GetUserIDFromToken(c)
+	claims, err := GetClaimsFromToken(c)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"status": "error", "message": "Unauthorized"})
 	}
 
 	var wallet models.Wallet
-	if err := db.DB.Where("user_id = ?", userID).First(&wallet).Error; err != nil {
+	if err := db.DB.Where("user_id = ?", claims.ID).First(&wallet).Error; err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"status": "error", "message": "User wallet not found"})
 	}
 

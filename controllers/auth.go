@@ -73,17 +73,17 @@ func Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func GetUserIDFromToken(c echo.Context) (uint, error) {
+func GetClaimsFromToken(c echo.Context) (*services.JWTClaims, error) {
 	user := c.Get("user")
 	if user == nil {
-		return 0, echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized access")
+		return nil, echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized access")
 	}
 
 	token := user.(*jwt.Token)
 	claims, ok := token.Claims.(*services.JWTClaims)
 	if !ok || !token.Valid {
-		return 0, echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
+		return nil, echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
 	}
 
-	return claims.ID, nil
+	return claims, nil
 }
