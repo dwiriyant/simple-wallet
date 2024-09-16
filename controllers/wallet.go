@@ -14,8 +14,10 @@ type transferRequest struct {
 	Amount   int    `json:"amount" validate:"required,numeric,gt=0"`
 }
 
+var GetClaimsFunc = GetClaimsFromToken
+
 func TransferMoney(c echo.Context) error {
-	claims, err := GetClaimsFromToken(c)
+	claims, err := GetClaimsFunc(c)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"status": "error", "message": "Unauthorized"})
 	}
@@ -54,7 +56,7 @@ func TransferMoney(c echo.Context) error {
 }
 
 func GetBalance(c echo.Context) error {
-	claims, err := GetClaimsFromToken(c)
+	claims, err := GetClaimsFunc(c)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"status": "error", "message": "Unauthorized"})
 	}
