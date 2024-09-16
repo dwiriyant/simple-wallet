@@ -57,7 +57,7 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"status": "error", "message": "Invalid credentials"})
 	}
 
-	token, err := services.GenerateJWT(int(user.ID), user.Username)
+	token, err := services.GenerateJWT(user.ID, user.Username)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to generate token"})
 	}
@@ -73,7 +73,7 @@ func Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func GetUserIDFromToken(c echo.Context) (int, error) {
+func GetUserIDFromToken(c echo.Context) (uint, error) {
 	user := c.Get("user")
 	if user == nil {
 		return 0, echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized access")

@@ -10,12 +10,12 @@ import (
 var JwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 type JWTClaims struct {
-	ID       int    `json:"id"`
+	ID       uint   `json:"id"`
 	Username string `json:"username"`
 	jwt.StandardClaims
 }
 
-func GenerateJWT(userID int, username string) (string, error) {
+func GenerateJWT(userID uint, username string) (string, error) {
 	claims := &JWTClaims{
 		ID:       userID,
 		Username: username,
