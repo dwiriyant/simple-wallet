@@ -5,15 +5,14 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 func TestWalletTransferSuccessCommit(t *testing.T) {
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("failed to create sqlmock: %v", err)
-	}
+	assert.NoError(t, err)
 	defer db.Close()
 
 	gormDB, err := gorm.Open(mysql.New(mysql.Config{
@@ -21,9 +20,7 @@ func TestWalletTransferSuccessCommit(t *testing.T) {
 		SkipInitializeWithVersion: true,
 	}), &gorm.Config{})
 
-	if err != nil {
-		t.Fatalf("failed to create gorm DB connection: %v", err)
-	}
+	assert.NoError(t, err)
 
 	wallet := Wallet{
 		ID:      1,
@@ -43,13 +40,10 @@ func TestWalletTransferSuccessCommit(t *testing.T) {
 	mock.ExpectCommit()
 
 	err = wallet.Transfer(gormDB, 1000)
-	if err != nil {
-		t.Errorf("unexpected error during transfer: %v", err)
-	}
+	assert.NoError(t, err)
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %v", err)
-	}
+	err = mock.ExpectationsWereMet()
+	assert.NoError(t, err)
 }
 
 func TestWalletTransferFailedRollback(t *testing.T) {
@@ -87,13 +81,10 @@ func TestWalletTransferFailedRollback(t *testing.T) {
 	mock.ExpectRollback()
 
 	err = wallet.Transfer(gormDB, 1000)
-	if err == nil {
-		t.Errorf("expected error during transfer, but got none")
-	}
+	assert.Error(t, err)
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %v", err)
-	}
+	err = mock.ExpectationsWereMet()
+	assert.NoError(t, err)
 }
 
 func TestWalletTransferFailedInsufficientFunds(t *testing.T) {
@@ -127,11 +118,8 @@ func TestWalletTransferFailedInsufficientFunds(t *testing.T) {
 	mock.ExpectRollback()
 
 	err = wallet.Transfer(gormDB, 1000)
-	if err == nil {
-		t.Errorf("expected error 'Insufficient funds', but got none")
-	}
+	assert.Error(t, err)
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %v", err)
-	}
+	err = mock.ExpectationsWereMet()
+	assert.NoError(t, err)
 }
