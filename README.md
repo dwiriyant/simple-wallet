@@ -1,5 +1,10 @@
 # Simple Wallet REST API
 
+## Tech Stack
+
+- Golang v1.23 : https://github.com/golang/go
+- MySQL (Database) : https://github.com/mysql/mysql-server
+
 ## Installation
 
 Clone the repository then switch to the repo folder
