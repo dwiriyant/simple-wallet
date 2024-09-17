@@ -1,9 +1,7 @@
 package db
 
 import (
-	"log"
 	"os"
-	"simple-wallet/models"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -29,13 +27,5 @@ func Init() {
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
-	}
-
-	err = DB.AutoMigrate(
-		&models.User{},
-		&models.Wallet{},
-	)
-	if err != nil {
-		log.Fatal("Failed to migrate database: ", err)
 	}
 }

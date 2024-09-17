@@ -2,9 +2,9 @@ package models
 
 import (
 	"errors"
+	"simple-wallet/db"
 	"time"
 
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -17,8 +17,8 @@ type Wallet struct {
 	User      User `gorm:"belongsTo"`
 }
 
-func (w *Wallet) Transfer(db *gorm.DB, toWallet Wallet, amount float64) (err error) {
-	tx := db.Begin()
+func (w *Wallet) Transfer(toWallet Wallet, amount float64) (err error) {
+	tx := db.DB.Begin()
 
 	defer func() {
 		switch err {

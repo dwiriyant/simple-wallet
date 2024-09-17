@@ -48,7 +48,7 @@ func TransferMoney(c echo.Context) error {
 	}
 
 	amount64 := float64(transferRequest.Amount)
-	if err := fromWallet.Transfer(db.DB, toWallet, amount64); err != nil {
+	if err := fromWallet.Transfer(toWallet, amount64); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"status": "error", "message": err.Error()})
 	}
 
