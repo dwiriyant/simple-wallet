@@ -1,12 +1,19 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"os"
+
+	"github.com/spf13/cobra"
+)
 
 var rootCmd = &cobra.Command{
 	Use:   "simple-wallet",
 	Short: "Simple Wallet REST API",
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+		if len(args) == 0 {
+			cmd.Run(startCmd, []string{})
+			os.Exit(0)
+		}
 	},
 }
 

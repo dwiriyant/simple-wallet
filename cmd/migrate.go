@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"os"
 	"simple-wallet/internal/infrastructure/db"
 
@@ -25,7 +26,7 @@ func init() {
 	rootCmd.AddCommand(migrateCmd)
 }
 
-var migrateHandler = func(cmd *cobra.Command, args []string) {
+func migrateHandler(cmd *cobra.Command, args []string) {
 	dbConn := db.Connect()
 	dbSql, _ := dbConn.DB()
 	goose.SetDialect("mysql")
@@ -37,7 +38,7 @@ var migrateHandler = func(cmd *cobra.Command, args []string) {
 	}
 	command := args[0]
 	cmdArgs := args[1:]
-	if err := goose.Run(command, dbSql, migrationDir, cmdArgs...); err != nil {
+	if err := goose.RunContext(context.Background(), command, dbSql, migrationDir, cmdArgs...); err != nil {
 		log.Fatalf("goose run: %v", err)
 	}
 }
