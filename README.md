@@ -20,6 +20,12 @@ Copy the example env file and make the required configuration changes in the .en
 cp .env.example .env
 ```
 
+Run migration
+
+```
+go run main.go migrate up
+```
+
 Run the golang development server
 
 ```
