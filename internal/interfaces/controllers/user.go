@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"net/http"
-	"simple-wallet/internal/application/services"
 	"simple-wallet/internal/application/usecases"
 	"simple-wallet/internal/domain/models"
+	"simple-wallet/internal/infrastructure/services"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
@@ -28,7 +28,7 @@ func (c *UserController) Register(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"status": "error", "message": "Invalid Request"})
 	}
 
-	if err := user.HashPassword(user.Password); err != nil {
+	if err := c.userService.HashPassword(user.Password, &user); err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"status": "error", "message": "Error hashing password"})
 	}
 
@@ -58,7 +58,7 @@ func (c *UserController) Login(ctx echo.Context) error {
 		return ctx.JSON(http.StatusUnauthorized, map[string]string{"status": "error", "message": "Invalid credentials"})
 	}
 
-	if err := user.CheckPassword(loginRequest.Password); err != nil {
+	if err := c.userService.CheckPassword(loginRequest.Password, user); err != nil {
 		return ctx.JSON(http.StatusUnauthorized, map[string]string{"status": "error", "message": "Invalid credentials"})
 	}
 

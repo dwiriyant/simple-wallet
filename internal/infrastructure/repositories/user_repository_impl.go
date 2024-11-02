@@ -4,6 +4,7 @@ import (
 	"simple-wallet/internal/domain/models"
 	"simple-wallet/internal/domain/repositories"
 
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -33,4 +34,17 @@ func (r *userRepositoryImpl) Login(username string, password string) error {
 		return err
 	}
 	return nil
+}
+
+func (r *userRepositoryImpl) HashPassword(password string, user *models.User) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user.Password = string(hashedPassword)
+	return nil
+}
+
+func (r *userRepositoryImpl) CheckPassword(providedPassword string, user *models.User) error {
+	return bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
 }

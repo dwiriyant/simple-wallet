@@ -24,3 +24,11 @@ func (s *UserService) Register(user *models.User) error {
 func (s *UserService) Login(username string, password string) error {
 	return s.userRepo.Login(username, password)
 }
+
+func (s *UserService) HashPassword(password string, user *models.User) error {
+	return s.userRepo.HashPassword(password, user)
+}
+
+func (s *UserService) CheckPassword(password string, user *models.User) error {
+	return s.userRepo.CheckPassword(password, user)
+}
