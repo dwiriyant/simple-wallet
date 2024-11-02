@@ -1,10 +1,10 @@
 package api
 
 import (
-	"simple-wallet/internal/application/services"
 	"simple-wallet/internal/application/usecases"
 	"simple-wallet/internal/infrastructure/db"
 	"simple-wallet/internal/infrastructure/repositories"
+	"simple-wallet/internal/infrastructure/services"
 	"simple-wallet/internal/interfaces/controllers"
 
 	"github.com/labstack/echo/v4"
