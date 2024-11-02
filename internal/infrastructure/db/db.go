@@ -1,11 +1,9 @@
 package db
 
 import (
-	"database/sql"
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/pressly/goose/v3"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -29,31 +27,10 @@ func Connect() *gorm.DB {
 		panic(err)
 	}
 
-	sqlDB, err := db.DB()
-	if err != nil {
-		panic(err)
-	}
-
-	err = runMigrations(sqlDB)
+	_, err = db.DB()
 	if err != nil {
 		panic(err)
 	}
 
 	return db
-}
-
-func runMigrations(db *sql.DB) error {
-	// Specify the path to the migration files
-	migrationDir := "internal/infrastructure/db/migrations"
-
-	if err := goose.SetDialect("mysql"); err != nil {
-		return err
-	}
-
-	// Run goose to apply all available migrations
-	if err := goose.Up(db, migrationDir); err != nil {
-		return err
-	}
-
-	return nil
 }
